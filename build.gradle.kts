@@ -51,6 +51,13 @@ tasks.withType(Javadoc::class).configureEach {
 publishing {
     repositories {
         mavenLocal()
+        maven(url = uri("https://maven.pkg.github.com/analysis-dev/sarif4k")) {
+            name = "GitHubPackages"
+            credentials {
+                username = project.findProperty("gpr.user") as String?
+                password = project.findProperty("gpr.key") as String?
+            }
+        }
     }
     publications {
         publications.withType<MavenPublication>().forEach { publication ->

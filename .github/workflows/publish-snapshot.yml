@@ -3,9 +3,10 @@ on:
   push:
     branches:
       - main
+      - feature/publishing
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     if: ${{ !contains(github.event.head_commit.message, 'Prepare for release') }}
     steps:
       - uses: actions/checkout@v2
@@ -28,7 +29,6 @@ jobs:
         run: ./gradlew build
 
       - name: Publish package
-        run: ./gradlew publishToSonatype
-        env:
-          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.MAVEN_CENTRAL_USER }}
-          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.MAVEN_CENTRAL_PW }}
+        run: |
+          ./gradlew publishAllPublicationsToGitHubPackagesRepository \
+            -Pgpr.user=${{ env.USER }} -Pgpr.key=${{ secrets.GITHUB_TOKEN }}
