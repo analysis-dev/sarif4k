@@ -1,13 +1,16 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    kotlin("multiplatform") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("multiplatform") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
     `maven-publish`
     signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("org.owasp.dependencycheck") version "7.3.0"
 }
 
-group = property("GROUP")
-version = property("VERSION")
+group = property("GROUP")!!
+version = property("VERSION")!!
 
 repositories {
     mavenCentral()
@@ -41,11 +44,30 @@ kotlin {
     }
 }
 
-tasks.withType(Javadoc::class).configureEach {
-    val customArgs = projectDir.resolve("javadoc-silence.txt")
-    customArgs.writeText("""-Xdoclint:none
-    """.trimIndent())
-    options.optionFiles?.add(customArgs)
+tasks {
+    withType<KotlinCompile>().configureEach {
+        this.kotlinOptions {
+            jvmTarget = "1.8"
+            freeCompilerArgs = listOf("-opt-in=kotlinx.serialization.ExperimentalSerializationApi")
+        }
+    }
+
+    withType<Javadoc>().configureEach {
+        val customArgs = projectDir.resolve("javadoc-silence.txt")
+        customArgs.writeText(
+            """-Xdoclint:none
+            """.trimIndent()
+        )
+        options.optionFiles?.add(customArgs)
+    }
+
+    withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
+}
+
+dependencyCheck {
+    analyzers.assemblyEnabled = false
 }
 
 publishing {
