@@ -66,7 +66,7 @@ publishing {
     repositories {
 
         mavenLocal()
-        maven(url = uri("https://maven.pkg.github.com/analysis-dev/sarif4k")) {
+        maven(url = uri("https://maven.pkg.github.com/saveourtool/sarif4k")) {
             name = "GitHubPackages"
             credentials {
                 username = project.findProperty("gpr.user") as String?
