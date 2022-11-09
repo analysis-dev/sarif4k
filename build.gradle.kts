@@ -63,6 +63,17 @@ dependencyCheck {
 }
 
 publishing {
+    repositories {
+
+        mavenLocal()
+        maven(url = uri("https://maven.pkg.github.com/analysis-dev/sarif4k")) {
+            name = "GitHubPackages"
+            credentials {
+                username = project.findProperty("gpr.user") as String?
+                password = project.findProperty("gpr.key") as String?
+            }
+        }
+    }
     publications {
         withType<MavenPublication> {
             artifact(tasks.findByName("dokkaJar"))
